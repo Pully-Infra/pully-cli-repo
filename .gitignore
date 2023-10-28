@@ -1,0 +1,7 @@
+node_modules
+yarn.lock
+dist
+.env
+pully_functions
+relationships.json
+yarn-error.log

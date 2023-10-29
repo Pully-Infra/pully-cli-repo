@@ -118,8 +118,6 @@ const deployNewInfraQuestions = {
 const PULLY_GLOBAL_DIRECTORY = `${homedir()}/.pully`;
 const PULLY_DEPLOY_DIRECTORY = `${PULLY_GLOBAL_DIRECTORY}/deploy`;
 const PULLY_ENVIRONMENT_PATH = `${PULLY_GLOBAL_DIRECTORY}/.env`;
-const TEST_REPO_NAME =
-  "https://thatjsprof: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@github.com/Pully-Infra/pully-deploy.git";
 const REPO_NAME = "https://github.com/Pully-Infra/pully-deploy.git";
 
 module.exports = {

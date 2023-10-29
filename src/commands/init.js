@@ -5,7 +5,6 @@ const {
   REPO_NAME,
   askQuestion,
   initFunction,
-  TEST_REPO_NAME,
   PULLY_FUNCTIONS,
   PULLY_TEST_FOLDER,
   initRelationshipJson,
@@ -93,7 +92,7 @@ const cloneDeploymentRepo = async () => {
   await Processes.changeDir(PULLY_GLOBAL_DIRECTORY);
   updateSpinnerText("Cloning deployment repo...");
   await checkDeployDirectory();
-  await Processes.run(`git clone -q ${TEST_REPO_NAME} ~/.pully/deploy`);
+  await Processes.run(`git clone -q ${REPO_NAME} ~/.pully/deploy`);
   spinnerSuccess("Deployment repo cloned successfully");
 };
 

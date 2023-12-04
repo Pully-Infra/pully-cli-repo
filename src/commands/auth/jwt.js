@@ -1,11 +1,21 @@
+const { PULLY_ENVIRONMENT_PATH } = require("../../utils/constants");
 const TokenUtils = require("../../utils/tokenUtils");
-const { v4: uuid } = require("uuid");
+const dotenv = require("dotenv");
+dotenv.config({ path: PULLY_ENVIRONMENT_PATH });
 
-const payload = uuid();
+const secret = process.env.SECRET;
+
+// Validate .env exists with the right credentials
+// persist tokens to s3 and find a way to revoke access
 
 const jwtFn = () => {
-  const newClientToken = TokenUtils.createToken(payload);
-  console.log(newClientToken);
+  try {
+    const newClientToken = TokenUtils.createToken({ secret });
+    console.log(`JWT Client Token: ${newClientToken}`);
+  } catch (err) {
+    console.log(err?.message || err);
+    process.exit(1);
+  }
 };
 
 module.exports = jwtFn;

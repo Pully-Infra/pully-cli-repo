@@ -1,7 +1,7 @@
 const ora = require("ora");
 
 const FileUtils = require("../../utils/fileUtils");
-const { lambdaService } = require("../..services");
+const { lambdaService } = require("../../services");
 const { PULLY_FUNCTIONS, initFunction } = require("../../utils/constants");
 
 const { fileOrfolderExistsSync, writeFile, createFolder, getFolderContents } =
@@ -22,6 +22,8 @@ const validateName = (name) => {
 };
 
 const spinner = ora("Adding Function(s) ...");
+
+// Write helper that checks if the env variables are present and if not quit the process.
 
 const addFnc = async (functionName) => {
   const validated = validateName(functionName);

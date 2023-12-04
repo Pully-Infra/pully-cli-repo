@@ -19,6 +19,9 @@ const {
   spinnerSuccess,
   updateSpinnerText,
 } = require("../utils/spinner");
+const { fromIni } = require("@aws-sdk/credential-provider-ini");
+const { homedir } = require("os");
+
 dotenv.config({ path: PULLY_ENVIRONMENT_PATH });
 
 const { writeFile, createMultipleFolders, fileOrfolderExistsSync } = FileUtils;
@@ -29,7 +32,7 @@ const createAWSCredentials = async ({
   region,
   access_key,
   secret_key,
-  session_token,
+  session_key,
 }) => {
   updateSpinnerText("Setting AWS Credentials...");
   await Processes.run(`aws configure set region ${region}`);
@@ -40,17 +43,42 @@ const createAWSCredentials = async ({
     `aws configure set default.aws_secret_access_key ${secret_key}`
   );
   await Processes.run(
-    `aws configure set default.aws_session_token ${session_token}`
+    `aws configure set default.aws_session_token ${session_key}`
   );
   spinnerSuccess("Credentials saved successfully");
 };
 
-const saveCredentials = async (awsCredentials) => {
+const getCredentials = async (field, value) => {
+  const credentialsProvider = fromIni({
+    profile: "default",
+  });
+
+  const credentials = await credentialsProvider();
+
+  return {
+    ...credentials,
+    [field]: value,
+  };
+};
+
+const getEnvCredentials = async (field, value) => {
+  const existingEnvValues = {
+    access_key: process.env.ACCESS_KEY,
+    secret_key: process.env.SECRET_KEY,
+    session_token: process.env.SESSION_KEY,
+    region: process.env.REGION,
+    [field]: value,
+  };
+
+  return existingEnvValues;
+};
+
+const saveEnvCredentials = async (awsCredentials) => {
   const { region, access_key, secret_key, session_token } = awsCredentials;
+  // Update this line with all the other required values
   const ENV_VARIABLES = `ACCESS_KEY=${access_key}\nSECRET_KEY=${secret_key}\nREGION=${region}\nSESSION_TOKEN=${session_token}`;
 
   await FileUtils.writeFile(PULLY_ENVIRONMENT_PATH, ENV_VARIABLES);
-  await createAWSCredentials(awsCredentials);
 };
 
 const createGlobalDirectory = async () => {
@@ -71,8 +99,6 @@ const checkDeployDirectory = async () => {
 };
 
 const createPullyClientDirectories = async () => {
-  updateSpinnerText("Creating pully directories...");
-
   // don't run the init function if some parameters exist already
   const folderPresent = await fileOrfolderExistsSync(PULLY_FUNCTIONS);
   const relationshipFilePresent = await fileOrfolderExistsSync(``);
@@ -82,6 +108,8 @@ const createPullyClientDirectories = async () => {
   }
 
   if (!folderPresent) {
+    updateSpinnerText("Creating pully directories...");
+
     await createMultipleFolders(PULLY_FUNCTIONS_PATH);
     await writeFile(`${PULLY_FUNCTIONS_PATH}/index.js`, initFunction);
     spinnerSuccess("Pully directories created successfully");
@@ -118,7 +146,7 @@ const deployInfrastructure = async () => {
   );
   await Processes.run(`chmod +x ${PULLY_DEPLOY_DIRECTORY}/lib/index.js`);
   await Processes.run(
-    "cdk deploy '*' --outputs-file cdk_outputs.json --require-approval never"
+    "cdk deploy --all --outputs-file cdk_outputs.json --require-approval never"
   );
   spinnerSuccess("Infrastructure has been deployed to AWS successfully");
 };
@@ -132,6 +160,12 @@ const printImportantInformation = async () => {
   const fileContents = await FileUtils.getFileContents(pathToDeploy);
   const parsedFileContents = JSON.parse(fileContents);
   console.log(parsedFileContents);
+
+  // Save to .env
+  // Lambda Role Name
+  // Server URL
+  // JWT Secret
+  // Redis Information
 };
 
 const askForInitialCredentials = async () => {
@@ -142,7 +176,8 @@ const askForInitialCredentials = async () => {
     deployNewInfraQuestions.REGION,
   ]);
 
-  await saveCredentials(awsCredentials);
+  await saveEnvCredentials(awsCredentials);
+  await createAWSCredentials(awsCredentials);
 };
 
 const init = async () => {
@@ -217,11 +252,6 @@ const init = async () => {
         await askForInitialCredentials();
       }
 
-      // clone deploy directory
-      // run npm install
-      // do a global install of aws cdk
-      // run the cdk deploy
-      // read the cdk outputs file and print relevant information to the terminal
       await cloneDeploymentRepo();
       await runInstalls();
       await deployInfrastructure();
@@ -245,4 +275,60 @@ const init = async () => {
   }
 };
 
-module.exports = init;
+const updateAccessKey = async () => {
+  console.log(homedir());
+  const response = await askQuestion([deployNewInfraQuestions.ACCESS_KEY]);
+  await Processes.run(
+    `aws configure set default.aws_access_key_id ${response.access_key}`
+  );
+
+  const updatedEnvCredentials = await getEnvCredentials(
+    "access_key",
+    response.access_key
+  );
+  await saveEnvCredentials(updatedEnvCredentials);
+};
+
+const updateSecretKey = async () => {
+  const response = await askQuestion([deployNewInfraQuestions.SECRET_KEY]);
+  await Processes.run(
+    `aws configure set default.aws_secret_access_key ${response.secret_key}`
+  );
+
+  const updatedEnvCredentials = await getEnvCredentials(
+    "secret_key",
+    response.secret_key
+  );
+  await saveEnvCredentials(updatedEnvCredentials);
+};
+
+const updateSessionToken = async () => {
+  const response = await askQuestion([deployNewInfraQuestions.SESSION_KEY]);
+  await Processes.run(
+    `aws configure set default.aws_session_token ${response.session_key}`
+  );
+
+  const updatedEnvCredentials = await getEnvCredentials(
+    "session_token",
+    response.session_token
+  );
+  await saveEnvCredentials(updatedEnvCredentials);
+};
+
+const updateRegion = async () => {
+  const response = await askQuestion([deployNewInfraQuestions.REGION]);
+  await Processes.run(`aws configure set region ${response.region}`);
+  const updatedEnvCredentials = await getEnvCredentials(
+    "region",
+    response.region
+  );
+  await saveEnvCredentials(updatedEnvCredentials);
+};
+
+module.exports = {
+  init,
+  updateRegion,
+  updateAccessKey,
+  updateSecretKey,
+  updateSessionToken,
+};

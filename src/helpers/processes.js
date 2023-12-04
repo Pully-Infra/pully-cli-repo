@@ -1,5 +1,5 @@
-import { exec, spawn } from "child_process";
-import { chdir } from "process";
+const { exec, spawn } = require("child_process");
+const { chdir } = require("process");
 
 class Processes {
   static changeDir = (dir) => {

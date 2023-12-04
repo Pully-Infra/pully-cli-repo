@@ -1,13 +1,19 @@
 #!/usr/bin/env node
 
-const { PULLY_ENVIRONMENT_PATH } = require("src/utils/constants");
+const { PULLY_ENVIRONMENT_PATH } = require("./src/utils/constants");
 require("dotenv").config({ path: PULLY_ENVIRONMENT_PATH });
 
 const { Command, program } = require("commander");
-const jwtFn = require("src/commands/auth/jwt");
-const { init } = require("./src/commands/init");
+const jwtFn = require("./src/commands/auth/jwt");
+const {
+  init,
+  updateAccessKey,
+  updateSecretKey,
+  updateSessionToken,
+  updateRegion,
+} = require("./src/commands/init");
 const { functions } = require("./src/commands/functions");
-const { relationships } = require("src/commands/relationships");
+const { relationships } = require("./src/commands/relationships");
 
 program
   .name("pully")
@@ -15,10 +21,9 @@ program
   .version("1.0.0")
   .option("-v, --verbose", "verbose logging");
 
-export const initFn = new Command("function")
-  .description(
-    `
-      This command helps you deploy the pully infrastructure to your AWS Account.
+const initFn = new Command("init").description(
+  `
+      This command helps you deploy the pully infrastructure to your AWS Account or update your AWS credentials for your default profile.
       
       A couple things to note:
       - You should run this command from the working directory where you want to use the cli.
@@ -26,7 +31,7 @@ export const initFn = new Command("function")
 
       -> The first time you run this command. You would be asked if you want to deploy a new pully infratructure:
         -> If No, the process checks if you already have a pully_functions folder and creates one if not then quits.
-        -> If Yes, you would be prompted to enter the following information:
+        -> If Yes, you would be prompted to enter the following information which are saved to your default profile:
           - AWS Access Key Id
           - AWS Secret Key Id
           - AWS Session Token Key
@@ -45,25 +50,23 @@ export const initFn = new Command("function")
       -> Select Yes when asked if you want to update your aws credentials
       -> Input your credentials
     `
-  )
-  .action(init);
+);
+
+initFn.action(init);
 
 initFn
   .command("access_key")
-  .description("Update Access Key")
-  .action(() => {});
+  .description("Update AWS Access Key")
+  .action(updateAccessKey);
 initFn
   .command("secret_key")
-  .description("Update Secret Key")
-  .action(() => {});
+  .description("Update AWS Secret Key")
+  .action(updateSecretKey);
 initFn
   .command("session_token")
-  .description("Update Session Token")
-  .action(() => {});
-initFn
-  .command("region")
-  .description("Update Region")
-  .action(() => {});
+  .description("Update AWS Session Token")
+  .action(updateSessionToken);
+initFn.command("region").description("Update AWS Region").action(updateRegion);
 
 program
   .command("jwt")

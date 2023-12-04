@@ -12,7 +12,7 @@ const { GetCallerIdentityCommand, STSClient } = require("@aws-sdk/client-sts");
 const client = new LambdaClient(GENERAL_CONFIG);
 const stsClient = new STSClient(GENERAL_CONFIG);
 
-const lambdaRole = CONFIG.LAMBDA_ROLE;
+const lambdaRole = CONFIG.LAMBDA_ROLE || "pully-lambda-role";
 
 class LambdaService {
   async create(params) {

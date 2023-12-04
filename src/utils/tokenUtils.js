@@ -5,7 +5,7 @@ const JWT_SECRET = CONFIG.SECRET_KEY;
 
 class TokenUtils {
   static createToken = (payload, expiresIn = 86400) => {
-    return jwt.sign(payload, `${JWT_SECRET}`, {
+    return jwt.sign(payload, JWT_SECRET, {
       expiresIn,
     });
   };

@@ -8,7 +8,7 @@ const {
   removeFolderAndContents,
 } = FileUtils;
 
-const cwd = process.cwd;
+const cwd = process.cwd();
 
 const Proceed = {
   yes: "yes",
@@ -38,7 +38,13 @@ const initFunction = `/*
 */
 
 const handler = async (message) => {
+    const { type, payload } = message;
+
     return message;
+};
+
+module.exports = {
+  handler,
 };
 `;
 
@@ -139,6 +145,5 @@ module.exports = {
   PULLY_GLOBAL_DIRECTORY,
   PULLY_DEPLOY_DIRECTORY,
   PULLY_ENVIRONMENT_PATH,
-  TEST_REPO_NAME,
   REPO_NAME,
 };

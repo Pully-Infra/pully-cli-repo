@@ -1,5 +1,5 @@
-## Pully Deploy
+## Pully CLI
 
 ### Information
 
-- Holds code for the pully cli
+- Holds code for the pully cli.

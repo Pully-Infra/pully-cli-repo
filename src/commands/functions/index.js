@@ -5,9 +5,7 @@ const deployFnc = require("./deploy");
 const { Command } = require("commander");
 const statusFnc = require("./status");
 
-export const functions = new Command("function").description(
-  "Manage pully functions"
-);
+const functions = new Command("function").description("Manage pully functions");
 
 functions
   .command("add")
@@ -30,3 +28,7 @@ functions
   .command("deploy")
   .description("Deploy changes to pully functions")
   .action(deployFnc);
+
+module.exports = {
+  functions,
+};

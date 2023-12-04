@@ -4,19 +4,19 @@ const AdmZip = require("adm-zip");
 const inquirer = require("inquirer");
 const { lstatSync, createReadStream } = require("node:fs");
 
-const { s3Service } = require("../../services");
+const { s3Service, iamService } = require("../../services");
 const FileUtils = require("../../utils/fileUtils");
 const { lambdaManager } = require("../../managers");
-const { Proceed } = require("../../interfaces/general");
 const {
   ACTIONS,
+  Proceed,
   PULLY_FUNCTIONS,
   ZIPPED_PULLY_FUNCTIONS,
   createZippedFunctionsFolder,
   removeDistFunctionsFolder,
   removeZippedFunctionsFolder,
-} = require("src/utils/constants");
-const generateTableWithInfo = require("src/helpers/generateTableWithInfo");
+} = require("../../utils/constants");
+const generateTableWithInfo = require("../../helpers/generateTableWithInfo");
 
 const { getFolderContents } = FileUtils;
 

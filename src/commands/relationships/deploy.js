@@ -8,7 +8,8 @@ dotenv.config({ path: PULLY_ENVIRONMENT_PATH });
 
 const spinner = ora("Deploying relationships file");
 
-const endpoint = process.env.SERVER_URL;
+const endpoint =
+  process.env.SERVER_URL || "http://127.0.0.1:3008/relationships";
 
 const deployFnc = async () => {
   try {
@@ -25,7 +26,7 @@ const deployFnc = async () => {
     });
 
     const message = response.data?.message;
-    spinner.stop();
+    spinner.succeed();
     console.log(message);
   } catch (err) {
     spinner.stop();
@@ -37,6 +38,8 @@ const deployFnc = async () => {
       .forEach((error) => {
         console.log(error);
       });
+
+    errorsArray.length === 0 && console.log(err);
     process.exit(1);
   }
 };

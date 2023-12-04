@@ -11,4 +11,6 @@ relationships
   .description("Deploy updated relationships file")
   .action(deployFnc);
 
-module.exports = relationships;
+module.exports = {
+  relationships,
+};

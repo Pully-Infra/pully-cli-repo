@@ -61,19 +61,15 @@ const generateTableWithInfo = async (tableHeader = ["Function", "Status"]) => {
 
         const saveStream = async () => {
           try {
-            return (
-              (new Promise() < string) |
-              (null >
-                ((resolve, reject) => {
-                  fileStream.on("finish", () => {
-                    resolve(`File saved successfully at ${writtenFile}`);
-                  });
+            return new Promise((resolve, reject) => {
+              fileStream.on("finish", () => {
+                resolve(`File saved successfully at ${writtenFile}`);
+              });
 
-                  fileStream.on("error", () => {
-                    reject(null);
-                  });
-                }))
-            );
+              fileStream.on("error", () => {
+                reject(null);
+              });
+            });
           } catch (error) {
             console.error(error);
             return null;
@@ -105,7 +101,10 @@ const generateTableWithInfo = async (tableHeader = ["Function", "Status"]) => {
     table.push([folder.name, status]);
   }
 
-  return { table, changesMap };
+  return {
+    table,
+    changesMap,
+  };
 };
 
 module.exports = generateTableWithInfo;

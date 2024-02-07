@@ -22,7 +22,9 @@ const {
 const { fromIni } = require("@aws-sdk/credential-provider-ini");
 const { homedir } = require("os");
 
-dotenv.config({ path: PULLY_ENVIRONMENT_PATH });
+dotenv.config({
+  path: PULLY_ENVIRONMENT_PATH,
+});
 
 const { writeFile, createMultipleFolders, fileOrfolderExistsSync } = FileUtils;
 
